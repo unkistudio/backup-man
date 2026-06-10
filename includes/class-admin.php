@@ -106,6 +106,7 @@ class Backup_Man_Admin {
                             <div class="bm-field">
                                 <label for="bm-new-domain-restore" class="bm-field-label">New Domain URL <span class="bm-field-hint">(optional)</span></label>
                                 <input type="text" id="bm-new-domain-restore" name="new_domain" class="bm-input" placeholder="e.g. https://mydomain.com or http://localhost:9090">
+                                <p class="bm-field-help">Leave empty to keep the domain from the backup. Set this to your target domain &mdash; for this install that is <code><?php echo esc_html(str_replace(array('http://','https://'), '', site_url())); ?></code>.</p>
                             </div>
                             <button type="submit" class="bm-btn bm-btn--warning">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
@@ -162,6 +163,7 @@ class Backup_Man_Admin {
                         <div class="bm-field">
                             <label for="bm-new-domain-backups" class="bm-field-label">New Domain URL <span class="bm-field-hint">(optional &mdash; applies to all restores below)</span></label>
                             <input type="text" id="bm-new-domain-backups" class="bm-input" placeholder="e.g. https://mydomain.com or http://localhost:9090">
+                            <p class="bm-field-help">Leave empty to keep the domain from the backup. Set this to your target domain &mdash; for this install that is <code><?php echo esc_html(str_replace(array('http://','https://'), '', site_url())); ?></code>.</p>
                         </div>
                         <div class="bm-backup-list">
                             <?php foreach ($backups as $backup): ?>

@@ -496,6 +496,21 @@
 
 .bm-input::placeholder {
     color: var(--bm-gray-400);
+}
+
+.bm-field-help {
+    font-size: 12px;
+    color: var(--bm-gray-500);
+    margin: 6px 0 0;
+    line-height: 1.4;
+}
+
+.bm-field-help code {
+    background: var(--bm-gray-100);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: var(--bm-gray-700);
 } 
 
 /* Empty state */
