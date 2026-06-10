@@ -457,6 +457,47 @@
     padding: 0;
 }
 
+/* Domain field */
+.bm-field {
+    margin-bottom: 16px;
+}
+
+.bm-field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bm-gray-700);
+    margin-bottom: 6px;
+}
+
+.bm-field-hint {
+    font-weight: 400;
+    color: var(--bm-gray-400);
+    font-size: 12px;
+}
+
+.bm-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--bm-gray-300);
+    border-radius: var(--bm-radius-sm);
+    font-size: 14px;
+    color: var(--bm-gray-800);
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.bm-input:focus {
+    outline: none;
+    border-color: var(--bm-primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.bm-input::placeholder {
+    color: var(--bm-gray-400);
+} 
+
 /* Empty state */
 .bm-empty {
     text-align: center;

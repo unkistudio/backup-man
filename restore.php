@@ -44,12 +44,26 @@ $exclude = array(
     $source . 'wp-content/backup-man-backups',
     $source . 'wp-content/plugins/backup-man',
 );
+
+$sql_file = file_exists($source . 'database/database.sql')
+    ? $source . 'database/database.sql'
+    : $extract_dir . 'database/database.sql';
+
+$new_domain = $data['new_domain'] ?? '';
+if ($new_domain) {
+    $old_domain = detect_old_domain($sql_file);
+    if ($old_domain && $old_domain !== $new_domain) {
+        replace_in_file($sql_file, $old_domain, $new_domain);
+        replace_in_dir($source, $old_domain, $new_domain, array($sql_file));
+    }
+}
+
 copy_dir($source, $wp_root, $exclude);
 
 require_once $wp_root . 'wp-load.php';
 global $wpdb;
 
-$sql = @file_get_contents($source . 'database/database.sql');
+$sql = @file_get_contents($sql_file);
 if ($sql) {
     foreach (parse_sql($sql) as $q) {
         if (trim($q)) $wpdb->query($q);
@@ -104,4 +118,47 @@ function delete_dir($dir) {
         is_dir($p) ? delete_dir($p) : unlink($p);
     }
     rmdir($dir);
+}
+
+function detect_old_domain($sql_file) {
+    $sql = @file_get_contents($sql_file);
+    if (!$sql) return '';
+
+    if (preg_match("/'siteurl'\s*,\s*'(https?:\/\/[^']+)'/i", $sql, $m)) {
+        return $m[1];
+    }
+    if (preg_match("/'home'\s*,\s*'(https?:\/\/[^']+)'/i", $sql, $m)) {
+        return $m[1];
+    }
+    if (preg_match_all("/'(https?:\/\/[a-z0-9._:\/-]+)'/i", $sql, $m)) {
+        $freq = array_count_values($m[1]);
+        arsort($freq);
+        return key($freq);
+    }
+
+    return '';
+}
+
+function replace_in_file($file, $old, $new) {
+    $content = @file_get_contents($file);
+    if ($content === false) return;
+    $content = str_replace($old, $new, $content);
+    file_put_contents($file, $content);
+}
+
+function replace_in_dir($dir, $old, $new, $skip_files = array()) {
+    $text_extensions = array('php', 'css', 'js', 'html', 'htm', 'txt', 'xml', 'json',
+        'htaccess', 'sql', 'ini', 'conf', 'yaml', 'yml', 'md', 'less', 'scss', 'sass',
+        'log', 'csv', 'rss', 'atom');
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+    foreach ($it as $file) {
+        if (!$file->isFile()) continue;
+        $path = $file->getPathname();
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        if (!in_array($ext, $text_extensions)) continue;
+        foreach ($skip_files as $skip) {
+            if ($path === $skip) continue 2;
+        }
+        replace_in_file($path, $old, $new);
+    }
 }

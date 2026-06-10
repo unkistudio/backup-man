@@ -103,6 +103,10 @@ class Backup_Man_Admin {
                                     <span class="bm-file-text">Choose a backup file&hellip;</span>
                                 </label>
                             </div>
+                            <div class="bm-field">
+                                <label for="bm-new-domain-restore" class="bm-field-label">New Domain URL <span class="bm-field-hint">(optional)</span></label>
+                                <input type="text" id="bm-new-domain-restore" name="new_domain" class="bm-input" placeholder="e.g. https://mydomain.com or http://localhost:9090">
+                            </div>
                             <button type="submit" class="bm-btn bm-btn--warning">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
                                 <span>Restore</span>
@@ -155,6 +159,10 @@ class Backup_Man_Admin {
                             <p>Create your first backup to get started. Your data is worth protecting.</p>
                         </div>
                     <?php else: ?>
+                        <div class="bm-field">
+                            <label for="bm-new-domain-backups" class="bm-field-label">New Domain URL <span class="bm-field-hint">(optional &mdash; applies to all restores below)</span></label>
+                            <input type="text" id="bm-new-domain-backups" class="bm-input" placeholder="e.g. https://mydomain.com or http://localhost:9090">
+                        </div>
                         <div class="bm-backup-list">
                             <?php foreach ($backups as $backup): ?>
                                 <div class="bm-backup-item">
@@ -179,10 +187,11 @@ class Backup_Man_Admin {
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                             Download
                                         </a>
-                                        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>" class="bm-inline-form">
+                                        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>" class="bm-inline-form bm-restore-form">
                                             <?php wp_nonce_field('backup_man_restore_file', 'backup_man_nonce'); ?>
                                             <input type="hidden" name="action" value="backup_man_restore_backup">
                                             <input type="hidden" name="backup_path" value="<?php echo esc_attr($backup['path']); ?>">
+                                            <input type="hidden" name="new_domain" value="">
                                             <button type="submit" class="bm-btn bm-btn--sm bm-btn--warning" onclick="return confirm('<?php echo esc_js('Restore this backup? This will overwrite your current site.'); ?>');">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
                                                 Restore
@@ -260,11 +269,21 @@ class Backup_Man_Admin {
         }
 
         $token = wp_generate_password(32, false);
-        file_put_contents(BACKUP_MAN_BACKUPS_DIR . '.restore-token', json_encode(array(
+        $token_data = array(
             'token' => $token,
             'zip_path' => $zip_path,
             'admin_url' => admin_url('admin.php'),
-        )));
+        );
+        if (!empty($_POST['new_domain'])) {
+            $new_domain = trim($_POST['new_domain']);
+            if (!preg_match('#^https?://#', $new_domain)) {
+                $new_domain = 'http://' . $new_domain;
+            }
+            if (preg_match('#^https?://[^\s]+$#', $new_domain)) {
+                $token_data['new_domain'] = rtrim($new_domain, '/');
+            }
+        }
+        file_put_contents(BACKUP_MAN_BACKUPS_DIR . '.restore-token', json_encode($token_data));
 
         wp_redirect(BACKUP_MAN_URL . 'restore.php?token=' . $token);
         exit;

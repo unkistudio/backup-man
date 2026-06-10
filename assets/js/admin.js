@@ -33,6 +33,11 @@
             }
         });
 
+        $('.bm-restore-form').on('submit', function() {
+            var domain = $('#bm-new-domain-backups').val().trim();
+            $(this).find('input[name="new_domain"]').val(domain);
+        });
+
         function formatSize(bytes) {
             if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + ' GB';
             if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB';
