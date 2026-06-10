@@ -12,7 +12,7 @@ WordPress plugin for one-click backup and restore.
 
 ## Installation
 
-1. [Download the latest release](https://github.com/unkistudio/backup-man/releases) or clone the repo and zip the `backup-man` folder
+1. Download or clone the repo and zip the `backup-man` folder
 2. Go to **Plugins → Add New → Upload Plugin** in your WordPress admin
 3. Choose the `.zip` file and click **Install Now**
 4. Activate via **Plugins → Backup Man**
